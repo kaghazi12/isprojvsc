@@ -1,0 +1,23 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.14",
+    "ethers": "^6.9.0",
+    "postcss": "^8.4.27",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.1",
+    "tailwindcss": "^3.5.0"
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1"
+  }
+}
