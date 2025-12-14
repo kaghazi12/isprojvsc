@@ -16,6 +16,7 @@ contract Voting {
         uint candidateCount;
         mapping(uint => Candidate) candidates;
         bool candidatesLocked;
+        uint256 endTime;
     }
 
     // Admin hardcoded in contract for security (set at compile time)
@@ -45,13 +46,14 @@ contract Voting {
     // No constructor required; admin is hardcoded above.
 
     // --- Admin functions ---
-    function createElection(string memory _name, string[] memory _candidateNames) public onlyAdmin {
+    function createElection(string memory _name, string[] memory _candidateNames, uint256 _durationSeconds) public onlyAdmin {
         electionCount++;
         Election storage e = elections[electionCount];
         e.id = electionCount;
         e.name = _name;
         e.isActive = true;
         e.candidateCount = 0;
+        e.endTime = block.timestamp + _durationSeconds;
 
         // Add initial candidates provided at setup
         for (uint i = 0; i < _candidateNames.length; i++) {
@@ -104,6 +106,7 @@ contract Voting {
 
         Election storage e = elections[electionId];
         require(e.isActive, "Election is not active");
+        require(block.timestamp < e.endTime, "Election has ended");
 
         require(candidateId > 0 && candidateId <= e.candidateCount, "Invalid candidateId");
 
@@ -125,6 +128,7 @@ contract Voting {
         require(_electionId > 0 && _electionId <= electionCount, "Invalid electionId");
         Election storage e = elections[_electionId];
         require(e.isActive, "Election not active");
+        require(block.timestamp >= e.endTime, "Election has not ended yet");
 
         e.isActive = false;
 
@@ -148,6 +152,16 @@ contract Voting {
         emit ElectionConcluded(_electionId, winnerId, winnerName, winnerVotes);
     }
 
+    // Auto-conclude election if time has passed
+    function autoCheckAndConcludeElection(uint _electionId) public onlyAdmin {
+        require(_electionId > 0 && _electionId <= electionCount, "Invalid electionId");
+        Election storage e = elections[_electionId];
+        
+        if (e.isActive && block.timestamp >= e.endTime) {
+            concludeElection(_electionId);
+        }
+    }
+
 
     // --- Read functions ---
     function getCandidate(uint _electionId, uint _candidateId) public view returns (Candidate memory) {
@@ -158,10 +172,11 @@ contract Voting {
         uint id,
         string memory name,
         bool isActive,
-        uint candidateCount
+        uint candidateCount,
+        uint256 endTime
     ) {
         Election storage e = elections[_electionId];
-        return (e.id, e.name, e.isActive, e.candidateCount);
+        return (e.id, e.name, e.isActive, e.candidateCount, e.endTime);
     }
 
     // Check whether an address has voted in a specific election

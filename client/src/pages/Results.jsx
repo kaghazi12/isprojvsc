@@ -23,12 +23,6 @@ export default function ResultsPage() {
           const e = await contract.getElection(i);
           list.push({ id: Number(e.id), name: e.name, isActive: e.isActive, candidateCount: Number(e.candidateCount) });
         }
-        try {
-          const tv = await contract.totalVotes();
-          if (!cancelled) setTotalVotes(Number(tv.toString()));
-        } catch (tvErr) {
-          console.debug('Failed to read totalVotes in Results page', tvErr?.message || tvErr);
-        }
         if (!cancelled) {
           setElections(list);
           if (list.length > 0) setSelected(list[0].id);
@@ -52,6 +46,16 @@ export default function ResultsPage() {
       const contract = new Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
 
       const e = await contract.getElection(Number(id));
+      
+      // Calculate total votes from candidates for this election
+      const candidateCount = Number(e.candidateCount);
+      let electionTotalVotes = 0;
+      for (let i = 1; i <= candidateCount; i++) {
+        const cand = await contract.getCandidate(Number(id), i);
+        electionTotalVotes += Number(cand.voteCount);
+      }
+      setTotalVotes(electionTotalVotes);
+      
       if (e.isActive) {
         setResults({ ongoing: true });
         setLoading(false);

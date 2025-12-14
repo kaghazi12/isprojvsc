@@ -1,4 +1,6 @@
-const hre = require("hardhat"); // CommonJS style
+const hre = require("hardhat");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
@@ -7,7 +9,15 @@ async function main() {
 
   const Voting = await hre.ethers.getContractFactory("Voting");
   const voting = await Voting.deploy();
-  console.log("Voting deployed to:", voting.target);
+  await voting.waitForDeployment();
+  const votingAddress = voting.target;
+  
+  console.log("Voting deployed to:", votingAddress);
+
+  // Save the address to a config file for other scripts to use
+  const configPath = path.join(__dirname, "deployedAddress.json");
+  fs.writeFileSync(configPath, JSON.stringify({ votingAddress }, null, 2));
+  console.log("Deployed address saved to:", configPath);
 }
 
 main().catch((error) => {
