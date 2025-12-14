@@ -31,13 +31,43 @@ async function main() {
     return;
   }
 
-  const tx1 = await voting.connect(adminSigner).createElection("Student Council 2025", ["Alice", "Bob", "Charlie"], 3600);
-  await tx1.wait();
-  console.log("First election created (1 hour duration)");
+  // Get current blockchain timestamp
+  const currentBlock = await hre.ethers.provider.getBlock('latest');
+  const currentTimestamp = currentBlock.timestamp;
+  console.log("Current blockchain timestamp:", currentTimestamp);
 
-  const tx2 = await voting.connect(adminSigner).createElection("Best Coding Language", ["JavaScript", "Python", "Rust"], 7200);
+  // Election durations (in seconds)
+  const election1Duration = 3600; // 10 seconds for testing
+  const election2Duration = 7200; // 1 hour
+
+  const tx1 = await voting.connect(adminSigner).createElection("Student Council 2025", ["Alice", "Bob", "Charlie"], election1Duration);
+  await tx1.wait();
+  console.log("First election created (10 seconds duration)");
+
+  const tx2 = await voting.connect(adminSigner).createElection("Best Coding Language", ["JavaScript", "Python", "Rust", "Go"], election2Duration);
   await tx2.wait();
-  console.log("Second election created (2 hours duration)");
+  console.log("Second election created (1 hour duration)");
+
+  // Save election metadata to file for frontend to use
+  const electionsMetadata = [
+    {
+      id: 1,
+      name: "Student Council 2025",
+      duration: election1Duration,
+      endTime: currentTimestamp + election1Duration
+    },
+    {
+      id: 2,
+      name: "Best Coding Language",
+      duration: election2Duration,
+      endTime: currentTimestamp + election2Duration
+    }
+  ];
+
+  const metadataPath = path.join(__dirname, "..", "..", "client", "public", "electionsMetadata.json");
+  fs.mkdirSync(path.dirname(metadataPath), { recursive: true });
+  fs.writeFileSync(metadataPath, JSON.stringify(electionsMetadata, null, 2));
+  console.log("Election metadata saved to:", metadataPath);
 
   console.log("Election and candidates initialized successfully!");
 }

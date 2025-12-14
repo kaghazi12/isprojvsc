@@ -18,6 +18,16 @@ async function main() {
   const configPath = path.join(__dirname, "deployedAddress.json");
   fs.writeFileSync(configPath, JSON.stringify({ votingAddress }, null, 2));
   console.log("Deployed address saved to:", configPath);
+
+  // Update the frontend's contractConfig.js with the new address
+  const frontendConfigPath = path.join(__dirname, "..", "..", "client", "src", "utils", "contractConfig.js");
+  const contractConfigContent = fs.readFileSync(frontendConfigPath, "utf8");
+  const updatedConfig = contractConfigContent.replace(
+    /export const CONTRACT_ADDRESS = "0x[0-9a-fA-F]{40}";/,
+    `export const CONTRACT_ADDRESS = "${votingAddress}";`
+  );
+  fs.writeFileSync(frontendConfigPath, updatedConfig);
+  console.log("Updated frontend contractConfig.js with new address");
 }
 
 main().catch((error) => {

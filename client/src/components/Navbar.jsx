@@ -173,7 +173,7 @@ export default function Navbar(){
           <ThemeToggle />
           {account ? (
             <div className="flex items-center gap-2">
-              <div className="px-4 py-2 bg-primary text-white rounded-lg">
+              <div className="px-4 py-2 bg-primary text-foreground rounded-lg">
                 {formatAddress(account)}
               </div>
               <button
@@ -181,7 +181,7 @@ export default function Navbar(){
                   console.log('Disconnect clicked');
                   disconnectWallet();
                 }}
-                className="text-sm px-3 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
+                className="text-background font-semibold text-sm px-3 py-2 rounded bg-red-500 hover:bg-red-600 "
                 type="button"
                 title="Disconnect wallet"
               >

@@ -36,7 +36,7 @@ body {
 .cosmic-button {
   @apply px-6 py-2 rounded-full font-medium;
   background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  color: hsl(var(--background));
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .cosmic-button:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(139,92,246,0.4); }
@@ -49,8 +49,23 @@ body {
 
 .container { max-width: 1024px; margin: 0 auto; padding: 1rem; }
 
+/* Select element styling for dark mode */
+select {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border, 200 10% 50%));
+}
+
+select option {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
 /* small helper */
 .badge { display:inline-block; padding: .25rem .5rem; border-radius: .375rem; font-size: .75rem; }
+
+.text-background { color: white; }
+.dark .text-background { color: black; }
 
 @media (prefers-color-scheme: dark) {
   body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }

@@ -1,4 +1,20 @@
-﻿export const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+﻿export const CONTRACT_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
+
+// Load elections metadata (created during init.js)
+let metadataPromise = fetch('/electionsMetadata.json')
+  .then(res => res.json())
+  .then(data => {
+    console.log('Elections metadata loaded:', data);
+    return data;
+  })
+  .catch(err => {
+    console.log('Elections metadata not found, will use contract times only');
+    return [];
+  });
+
+export const getElectionMetadata = async () => {
+  return await metadataPromise;
+};
 
 export const CONTRACT_ABI = [
   {
@@ -83,9 +99,27 @@ export const CONTRACT_ABI = [
   },
   {
     "inputs": [],
+    "name": "getCurrentTimestamp",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "admin",
     "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {"indexed": false, "internalType": "uint256", "name": "electionId", "type": "uint256"},
+      {"indexed": false, "internalType": "uint256", "name": "winnerId", "type": "uint256"},
+      {"indexed": false, "internalType": "string", "name": "winnerName", "type": "string"},
+      {"indexed": false, "internalType": "uint256", "name": "winnerVotes", "type": "uint256"}
+    ],
+    "name": "ElectionConcluded",
+    "type": "event"
   }
 ];

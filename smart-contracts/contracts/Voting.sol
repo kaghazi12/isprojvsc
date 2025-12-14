@@ -184,6 +184,11 @@ contract Voting {
         return hasVoted[_electionId][_voter];
     }
 
+    // Get current block timestamp
+    function getCurrentTimestamp() public view returns (uint256) {
+        return block.timestamp;
+    }
+
     // Return results for an election: arrays of ids, names and vote counts, plus winnerId
     function getElectionResults(uint _electionId) public view returns (
         uint[] memory ids,
@@ -199,14 +204,21 @@ contract Voting {
         names = new string[](count);
         votes = new uint[](count);
 
+        winnerId = 0;
+        uint winnerVotes = 0;
+
         for (uint i = 0; i < count; i++) {
             uint idx = i + 1; // candidate ids are 1-based
             Candidate storage c = e.candidates[idx];
             ids[i] = c.id;
             names[i] = c.name;
             votes[i] = c.voteCount;
+            
+            // Calculate winner based on highest vote count
+            if (c.voteCount > winnerVotes) {
+                winnerVotes = c.voteCount;
+                winnerId = c.id;
+            }
         }
-
-        winnerId = electionWinner[_electionId];
     }
 }
